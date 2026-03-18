@@ -1,0 +1,7 @@
+{
+  "name": "Bean & Brew Café",
+  "description": "A premium, fully dynamic café website with a real-time admin dashboard for order management, menu control, and customer engagement.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

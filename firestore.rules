@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: categories
+    // Fields: name (string), slug (string), image (string)
+    //
+    // Collection: products
+    // Fields: name (string), description (string), price (number), categoryId (string), image (string), isFeatured (bool), status (string)
+    //
+    // Collection: orders
+    // Fields: customerName (string), email (string), phone (string), address (string), items (list), total (number), status (string), createdAt (timestamp)
+    //
+    // Collection: messages
+    // Fields: name (string), email (string), subject (string), message (string), createdAt (timestamp)
+    //
+    // Collection: settings
+    // Fields: heroTitle (string), heroSubtitle (string), heroImage (string), aboutText (string), contactEmail (string), contactPhone (string), contactAddress (string), googleMapsUrl (string)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "anshpandey.ayodhya@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    match /categories/{catId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /products/{prodId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow read: if isAdmin();
+      allow create: if true; // Allow customers to place orders
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /messages/{msgId} {
+      allow read: if isAdmin();
+      allow create: if true; // Allow customers to send messages
+      allow delete: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

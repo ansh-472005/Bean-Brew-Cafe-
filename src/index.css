@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cafe-brown: #4A3728;
+  --color-cafe-cream: #F5F2ED;
+  --color-cafe-beige: #D2B48C;
+  --color-cafe-gold: #C5A059;
+  --color-cafe-dark: #2C1E16;
+}
+
+@layer base {
+  body {
+    @apply bg-cafe-cream text-cafe-dark font-sans;
+  }
+}
